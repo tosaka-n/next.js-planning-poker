@@ -1,21 +1,18 @@
-import { Divider, HStack } from "@chakra-ui/react"
-import { ReactNode } from "react"
-import { Header } from "src/components/Header"
-import { Sidebar } from "src/components/Sidebar"
+import { HStack } from "@chakra-ui/react";
+import { ReactNode } from "react";
+import { Header } from "src/components/Header";
 
-export const Layout = ({ isOpen, onClose, onOpen, children }: { isOpen: boolean, onClose: () => void, onOpen: () => void, children: ReactNode }) => {
+export const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <>
-      <Header isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
+      <Header />
       <HStack
-        justifyContent={'flex-start'}
-        alignItems={'flex-start'}
+        justifyContent={"flex-start"}
+        alignItems={"flex-start"}
         spacing={0}
       >
-        <Sidebar />
-        <Divider h={'calc(100vh - 3rem)'} orientation='vertical' variant={'solid'} borderColor='black' />
         {children}
       </HStack>
     </>
-  )
-}
+  );
+};

@@ -1,7 +1,6 @@
-import { Box, Heading, HStack, Image, Spacer } from "@chakra-ui/react";
-import { SomeModal } from "./Modal";
+import { Box, HStack, Image, Spacer } from "@chakra-ui/react";
 
-export const Header = ({ isOpen, onClose, onOpen }: { isOpen: boolean, onClose: () => void, onOpen: () => void }) => (
+export const Header = () => (
   <Box
     position={'sticky'}
     top={0}
@@ -20,10 +19,9 @@ export const Header = ({ isOpen, onClose, onOpen }: { isOpen: boolean, onClose: 
         {'HEAD TITLE'}
       </Box>
       <Spacer/>
-      <Box pr={'1rem'} onClick={onOpen}>
+      <Box pr={'1rem'}>
         <Image h={'2rem'} src='https://xsgames.co/randomusers/avatar.php?g=male' />
       </Box>
-      <SomeModal isOpen={isOpen} onClose={onClose} />
     </HStack>
   </Box>
 )
