@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "tsc -p tsconfig.server.json && NODE_ENV=development node ./dist/index.js",
-    "build": "tsc -p tsconfig.server.json",
-    "start": "next start",
+    "build": "next build && tsc -p tsconfig.server.json",
+    "start": "ls -la && node ./dist/index.js",
     "lint": "next lint"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "@types/react": "^18.0.5",
     "express": "^4.18.1",
     "framer-motion": "^6.3.0",
+    "nanoid": "^3.3.3",
     "next": "12.1.5",
     "react": "18.0.0",
     "react-dom": "18.0.0",
