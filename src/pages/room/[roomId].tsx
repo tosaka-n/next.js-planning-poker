@@ -62,7 +62,7 @@ const Room = () => {
     }
   }, [roomId]);
   const sendMessage = (event?: React.MouseEvent<HTMLButtonElement>): void => {
-    if (sendMessage.length === 0) {
+    if (messageValue.length === 0) {
       return;
     }
     socket.emit("message", { message: messageValue, roomId, userId });
