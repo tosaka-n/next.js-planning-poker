@@ -88,8 +88,9 @@ const Room = () => {
           </Heading>
           <Button
             isDisabled={
-              !isOpen &&
-              !roomInfo?.member.every((member) => member.vote != null)
+              isOpen ||
+              (!isOpen &&
+                !roomInfo?.member.every((member) => member.vote != null))
             }
             onClick={() => handleOpen()}
           >

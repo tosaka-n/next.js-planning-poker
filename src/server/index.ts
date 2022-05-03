@@ -122,6 +122,7 @@ app.prepare().then(async () => {
     socket.on("reset", ({roomId}) => {
       roomDetails[roomId].roomInfo.member = roomDetails[roomId].roomInfo.member.map(member => ({...member, vote: null}))
       socket.to(roomId).emit("roomInfo", roomDetails[roomId]);
+      socket.to(roomId).emit("reset");
     });
   });
 
