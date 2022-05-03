@@ -3,128 +3,148 @@ import {
   Button,
   Center,
   Container,
+  Flex,
   Heading,
-  Input,
+  HStack,
   Spinner,
-  Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Layout } from "src/components/Layout";
 import io from "socket.io-client";
-import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
-import { GetServerSideProps } from "next";
-import { NextRequest } from "next/server";
+import { RoomDetails } from "src/server";
+import Card from "src/components/Card";
 
 const Room = () => {
   const [socket, _] = useState(() => io());
   const [messageLogs, setMessageLogs] = useState<
     { message: string; userId: string }[]
   >([]);
-  const [messageValue, setSendMessages] = useState<string>("");
-  const [userId, setUserId] = useState<string>();
+  const [vote, setVote] = useState<string | null>(null);
   const [connected, setConnected] = useState<boolean>(false);
-  const [messageLength, setShowMessageLength] = useState<number>(5);
+  const [isOpen, setOpen] = useState<boolean>(false);
+  const [roomInfo, setRoomInfo] = useState<RoomDetails["roomInfo"]>();
   const router = useRouter();
   const { roomId } = router.query;
 
   useEffect(() => {
-    let savedUserId = localStorage.getItem("userId");
-    if (!savedUserId) {
-      savedUserId = nanoid(5);
-      localStorage.setItem("userId", savedUserId);
-    }
-    setUserId(savedUserId);
     if (!roomId) {
       return;
     }
-    socket.on("roomInfo", (data: { message: string; userId: string }[]) => {
+    socket.on("connect", () => {
+      console.log("join");
+      socket.emit("join", { roomId });
+    });
+    socket.on("roomInfo", (data: RoomDetails) => {
+      console.log("Recieve: roomInfo");
+      console.log({ ...data.roomInfo });
+      setConnected(true);
       if (!data) {
         return;
       }
-      if (data?.length === 0) {
+      if (data.log?.length === 0) {
         setMessageLogs((_) => []);
+        return;
       }
       if (messageLogs.length === 0) {
-        setMessageLogs((prev) => [...prev, ...data]);
+        setRoomInfo(data.roomInfo);
       }
-    });
-    socket.on("connect", () => {
-      console.log("join");
-      setConnected(true);
-      socket.emit("join", { roomId, userId: savedUserId });
     });
     socket.on("message", (data: { message: string; userId: string }) => {
       setMessageLogs((prev) => [...prev, data]);
     });
-    if (messageLogs.length === 0) {
-      socket.emit("logs", { roomId });
+    socket.on("open", () => {
+      setOpen(true);
+    });
+    socket.on("reset", () => {
+      setOpen(false);
+      setVote(null);
+    });
+    socket.emit("logs", { roomId });
+    setInterval(() => socket.emit("logs", { roomId }), 2.5 * 1000);
+  }, [roomId, isOpen]);
+  const handleVote = (value: string | null) => {
+    setVote(value);
+    socket.emit("vote", { roomId, vote: value });
+  };
+  const handleOpen = () => {
+    setOpen(true);
+    setVote(null);
+    socket.emit("open", { roomId });
+  };
+  const handleReset = () => {
+    if (isOpen) {
+      setOpen(false);
+      setVote(null);
     }
-  }, [roomId]);
-  const sendMessage = (event?: React.MouseEvent<HTMLButtonElement>): void => {
-    if (messageValue.length === 0) {
-      return;
-    }
-    socket.emit("message", { message: messageValue, roomId, userId });
-    setSendMessages("");
-  };
-  const clearAllMessage = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    socket.emit("clearAll", { roomId, userId });
-    setMessageLogs([]);
-  };
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.currentTarget?.value.length === 0) {
-      return;
-    }
-    setSendMessages(event.currentTarget?.value);
-  };
-  const handleReadMore = (event: React.MouseEvent<HTMLButtonElement>): void => {
-    setShowMessageLength(messageLength + 5);
-  };
-  const handleReadLess = (event: React.MouseEvent<HTMLButtonElement>): void => {
-    setShowMessageLength(messageLength - 5);
-  };
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
-      sendMessage();
-    } else {
-      return;
-    }
+    socket.emit("reset", { roomId });
   };
   return (
     <Layout>
       {connected ? (
-        <Container>
-          <Heading>Room: {roomId}</Heading>
-          <Input
-            value={messageValue}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          ></Input>
-          <Button onClick={sendMessage}>Send</Button>
-          <Button onClick={clearAllMessage}>Clear All</Button>
-          <Box>
-            {messageLogs
-              .slice(-messageLength)
-              .reverse()
-              .map((msgs, index) => (
-                <Text key={index}>
-                  {msgs.userId}: {msgs.message}
-                </Text>
-              ))}
-          </Box>
+        <Box>
+          <Heading>
+            Room: {roomId} / UserId: {socket.id}
+          </Heading>
           <Button
-            disabled={messageLength > messageLogs.length}
-            onClick={handleReadMore}
+            isDisabled={
+              !isOpen &&
+              !roomInfo?.member.every((member) => member.vote != null)
+            }
+            onClick={() => handleOpen()}
           >
-            Read More
+            Open Vote
           </Button>
-          <Button disabled={messageLength <= 5} onClick={handleReadLess}>
-            Less
+          <Button isDisabled={!isOpen} onClick={() => handleReset()}>
+            Reset Vote
           </Button>
-        </Container>
+          <Flex
+            justifyItems={"center"}
+            border={"3px solid"}
+            borderColor={"black"}
+          >
+            <HStack
+              border={"3px"}
+              borderColor={"black"}
+              spacing={"2rem"}
+              mx={"auto"}
+              my={"2rem"}
+            >
+              {["0", "1/2", "1", "3", "5", "8", "13", "20", "?"].map(
+                (value, index) => (
+                  <Card
+                    index={`card_${index}`}
+                    value={value}
+                    isClickable={!isOpen}
+                    isSelected={vote === value}
+                    handleCardClick={(vote) => handleVote(vote)}
+                  />
+                )
+              )}
+            </HStack>
+          </Flex>
+          <Flex justifyItems={"center"}>
+            <HStack spacing={"2rem"} m={"auto"} mt={"2rem"}>
+              {roomInfo?.member.map((member, index) => (
+                <Card
+                  index={`result_${index}`}
+                  value={member.vote}
+                  isClickable={false}
+                  isSelected={member.vote !== null}
+                  isOpen={isOpen}
+                  handleCardClick={() => {}}
+                />
+              ))}
+              <Box display={isOpen ? "block" : "none"}>
+                Avarage{" "}
+                {(roomInfo?.member
+                  .map((v) => (v.vote === "1/2" ? 0.5 : Number(v.vote) || 0))
+                  .reduce((prev, cur) => prev + cur) || 1) /
+                  (roomInfo?.member.length || 1)}
+              </Box>
+            </HStack>
+          </Flex>
+        </Box>
       ) : (
         <Container>
           <Center>
