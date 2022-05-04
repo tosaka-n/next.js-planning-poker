@@ -51,15 +51,15 @@ const Card = ({
       transition={"transition: all 0.4s ease s;"}
       _focus={{ boxShadow: "none" }}
       _hover={{
-        textColor: "gray",
-        bgColor: isSelected ? "black" : "transparent",
+        textColor: "white",
+        bgColor: isSelected ? "red.700" : "red.600",
       }}
       onClick={() => handleOnClck(value)}
-      bgColor={isSelected ? "black" : "white"}
+      bgColor={isSelected ? "red.600" : "white"}
       animation={isSelected ? animation : ""}
     >
       {isOpen ? (
-        <Text key={`card_${index}`} textAlign={"center"}>
+        <Text key={`card_${index}`} textAlign={"center"} whiteSpace={'pre'}>
           {value}
         </Text>
       ) : (
