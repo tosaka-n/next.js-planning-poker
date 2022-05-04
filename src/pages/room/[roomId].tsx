@@ -7,6 +7,8 @@ import {
   Heading,
   HStack,
   Spinner,
+  Stack,
+  VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Layout } from "src/components/Layout";
@@ -14,6 +16,7 @@ import io from "socket.io-client";
 import { useRouter } from "next/router";
 import { RoomDetails } from "src/server";
 import Card from "src/components/Card";
+import FlipCard from "src/components/FlipCard";
 
 const Room = () => {
   const [socket, _] = useState(() => io());
@@ -69,7 +72,6 @@ const Room = () => {
   };
   const handleOpen = () => {
     setOpen(true);
-    setVote(null);
     socket.emit("open", { roomId });
   };
   const handleReset = () => {
@@ -103,13 +105,14 @@ const Room = () => {
             justifyItems={"center"}
             border={"3px solid"}
             borderColor={"black"}
+            bgColor={"whatsapp.200"}
+            w={"100vw"}
+            mx={"auto"}
           >
             <HStack
-              border={"3px"}
-              borderColor={"black"}
-              spacing={"2rem"}
-              mx={"auto"}
               my={"2rem"}
+              mx={"auto"}
+              display={{ base: "none", lg: "flex" }}
             >
               {["0", "1/2", "1", "3", "5", "8", "13", "20", "?"].map(
                 (value, index) => (
@@ -123,11 +126,42 @@ const Room = () => {
                 )
               )}
             </HStack>
+            <Stack
+              align="stretch"
+              my={"1rem"}
+              mx={"auto"}
+              display={{ base: "flex", lg: "none" }}
+            >
+              {[
+                ["0", "1/2", "1"],
+                ["3", "5", "8"],
+                ["13", "20", "?"],
+              ].map((arr) => (
+                <HStack mx={"auto"}>
+                  {arr.map((value, index) => (
+                    <Card
+                      index={`card_${index}`}
+                      value={value}
+                      isClickable={!isOpen}
+                      isSelected={vote === value}
+                      handleCardClick={(vote) => handleVote(vote)}
+                    />
+                  ))}
+                </HStack>
+              ))}
+            </Stack>
           </Flex>
-          <Flex justifyItems={"center"}>
+          <VStack justifyItems={"center"}>
+            <Box display={isOpen ? "block" : "none"}>
+              Avarage{" "}
+              {(roomInfo?.member
+                .map((v) => (v.vote === "1/2" ? 0.5 : Number(v.vote) || 0))
+                .reduce((prev, cur) => prev + cur) || 1) /
+                (roomInfo?.member.length || 1)}
+            </Box>
             <HStack spacing={"2rem"} m={"auto"} mt={"2rem"}>
               {roomInfo?.member.map((member, index) => (
-                <Card
+                <FlipCard
                   index={`result_${index}`}
                   value={member.vote}
                   isClickable={false}
@@ -136,15 +170,8 @@ const Room = () => {
                   handleCardClick={() => {}}
                 />
               ))}
-              <Box display={isOpen ? "block" : "none"}>
-                Avarage{" "}
-                {(roomInfo?.member
-                  .map((v) => (v.vote === "1/2" ? 0.5 : Number(v.vote) || 0))
-                  .reduce((prev, cur) => prev + cur) || 1) /
-                  (roomInfo?.member.length || 1)}
-              </Box>
             </HStack>
-          </Flex>
+          </VStack>
         </Box>
       ) : (
         <Container>
