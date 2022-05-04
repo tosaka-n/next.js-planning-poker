@@ -1,9 +1,4 @@
-import {
-  usePrefersReducedMotion,
-  Box,
-  Button,
-  Text,
-} from "@chakra-ui/react";
+import { usePrefersReducedMotion, Box, Button, Text } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 
 const spin = keyframes`
@@ -38,11 +33,11 @@ const Card = ({
       key={`${index}`}
       border={"3px solid"}
       borderRadius={"1rem"}
-      w={"6.5rem"}
-      h={"10rem"}
+      h={{ base: "6rem", md: "10rem" }}
+      w={{ base: "4rem", md: "6.5rem" }}
       alignItems={"center"}
       alignContent={"center"}
-      fontSize={"xx-large"}
+      fontSize={{ base: "xxs", md: "xx-large" }}
       fontWeight={"bold"}
       textColor={isSelected ? "white" : "black"}
       justifyContent={"center"}
@@ -59,7 +54,7 @@ const Card = ({
       animation={isSelected ? animation : ""}
     >
       {isOpen ? (
-        <Text key={`card_${index}`} textAlign={"center"} whiteSpace={'pre'}>
+        <Text key={`card_${index}`} textAlign={"center"} whiteSpace={"pre"}>
           {value}
         </Text>
       ) : (

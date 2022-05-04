@@ -47,14 +47,14 @@ const FlipCard = ({
       handleCardClick={() => {}}
     />
   ) : (
-    <Box h={"10rem"} w={"6.5rem"}>
+    <Box h={{ base: "6rem", md: "10rem" }} w={{ base: "4rem", md: "6.5rem" }}>
       <Box
         position={"relative"}
         key={`${index}`}
         border={"3px solid"}
         borderRadius={"1rem"}
-        w={"6.5rem"}
-        h={"10rem"}
+        h={{ base: "6rem", md: "10rem" }}
+        w={{  base: "4rem", md: "6.5rem", }}
         alignItems={"center"}
         alignContent={"center"}
         fontSize={"xx-large"}
@@ -69,7 +69,7 @@ const FlipCard = ({
         onClick={() => handleOnClck(value)}
         bgColor={"black"}
         bgImage={cardBg.src}
-        backgroundSize={"6rem 6rem"}
+        backgroundSize={{ base: "1rem 1rem", lg: "6rem 6rem" }}
         backgroundRepeat={"no-repeat"}
         backgroundPosition={"center"}
         animation={isOpen ? animation1 : animation2}
@@ -81,8 +81,8 @@ const FlipCard = ({
         key={`${index}`}
         border={"3px solid"}
         borderRadius={"1rem"}
-        w={"6.5rem"}
-        h={"10rem"}
+        h={{ base: "6rem", md: "10rem" }}
+        w={{  base: "4rem", md: "6.5rem", }}
         alignItems={"center"}
         alignContent={"center"}
         fontSize={"xx-large"}
@@ -95,7 +95,7 @@ const FlipCard = ({
         bgColor={"white"}
         animation={isOpen ? animation2 : animation1}
         style={{ backfaceVisibility: "hidden" }}
-        top={"-10rem"}
+        top={{ base: "-6rem", md: "-10rem" }}
         opacity={isOpen ? 1 : 0}
       >
         <Text key={`card_${index}`} textAlign={"center"} whiteSpace={"pre"}>

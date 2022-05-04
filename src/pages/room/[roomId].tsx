@@ -106,7 +106,7 @@ const Room = () => {
             border={"3px solid"}
             borderColor={"black"}
             bgColor={"whatsapp.200"}
-            w={"100vw"}
+            w={{base: 'fit-content', sm: "100vw"}}
             mx={"auto"}
           >
             <HStack
@@ -133,11 +133,10 @@ const Room = () => {
               display={{ base: "flex", lg: "none" }}
             >
               {[
-                ["0", "1/2", "1"],
-                ["3", "5", "8"],
-                ["13", "20", "?"],
+                ["0", "1/2", "1", "3"],
+                ["5", "8", "13", "20", "?"],
               ].map((arr) => (
-                <HStack mx={"auto"}>
+                <HStack mx={"auto"} spacing={{ base: "1rem", md: "2rem" }}>
                   {arr.map((value, index) => (
                     <Card
                       index={`card_${index}`}
@@ -159,7 +158,7 @@ const Room = () => {
                 .reduce((prev, cur) => prev + cur) || 1) /
                 (roomInfo?.member.length || 1)}
             </Box>
-            <HStack spacing={"2rem"} m={"auto"} mt={"2rem"}>
+            <HStack spacing={"2rem"} m={"auto"} mt={{base: "1rem", md: "2rem"}}>
               {roomInfo?.member.map((member, index) => (
                 <FlipCard
                   index={`result_${index}`}
