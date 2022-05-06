@@ -6,14 +6,12 @@ from { transform: rotate3d(0, 1, 0, 0); }
 to { transform: rotate3d(0, 1, 0, 360deg); }
 `;
 const Card = ({
-  index,
   value,
   isClickable = false,
   isSelected = false,
   isOpen = true,
   handleCardClick,
 }: {
-  index: string;
   value: string | null;
   isClickable: boolean;
   isSelected: boolean;
@@ -30,7 +28,6 @@ const Card = ({
   };
   return (
     <Box
-      key={`${index}`}
       border={"3px solid"}
       borderRadius={"1rem"}
       h={{ base: "6rem", md: "10rem" }}
@@ -54,7 +51,7 @@ const Card = ({
       animation={isSelected ? animation : ""}
     >
       {isOpen ? (
-        <Text key={`card_${index}`} textAlign={"center"} whiteSpace={"pre"}>
+        <Text textAlign={"center"} whiteSpace={"pre"}>
           {value}
         </Text>
       ) : (

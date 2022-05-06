@@ -12,14 +12,12 @@ to { transform: rotateY(0deg); }
 `;
 
 const FlipCard = ({
-  index,
   value,
   isClickable = false,
   isSelected = false,
   isOpen = true,
   handleCardClick,
 }: {
-  index: string;
   value: string | null;
   isClickable: boolean;
   isSelected: boolean;
@@ -43,18 +41,16 @@ const FlipCard = ({
       isSelected={false}
       isOpen={true}
       value={"NOT\nYET"}
-      index={""}
       handleCardClick={() => {}}
     />
   ) : (
     <Box h={{ base: "6rem", md: "10rem" }} w={{ base: "4rem", md: "6.5rem" }}>
       <Box
         position={"relative"}
-        key={`${index}`}
         border={"3px solid"}
         borderRadius={"1rem"}
         h={{ base: "6rem", md: "10rem" }}
-        w={{  base: "4rem", md: "6.5rem", }}
+        w={{ base: "4rem", md: "6.5rem" }}
         alignItems={"center"}
         alignContent={"center"}
         fontSize={"xx-large"}
@@ -69,7 +65,7 @@ const FlipCard = ({
         onClick={() => handleOnClck(value)}
         bgColor={"black"}
         bgImage={cardBg.src}
-        backgroundSize={{ base: "1rem 1rem", lg: "6rem 6rem" }}
+        backgroundSize={{ base: "3rem 3rem", lg: "6rem 6rem" }}
         backgroundRepeat={"no-repeat"}
         backgroundPosition={"center"}
         animation={isOpen ? animation1 : animation2}
@@ -78,27 +74,26 @@ const FlipCard = ({
       />
       <Box
         position={"relative"}
-        key={`${index}`}
         border={"3px solid"}
         borderRadius={"1rem"}
         h={{ base: "6rem", md: "10rem" }}
-        w={{  base: "4rem", md: "6.5rem", }}
+        w={{ base: "4rem", md: "6.5rem" }}
         alignItems={"center"}
         alignContent={"center"}
-        fontSize={"xx-large"}
+        fontSize={{ base: "md", sm: "xx-large" }}
         fontWeight={"bold"}
         textColor={"black"}
         justifyContent={"center"}
         as={Button}
         _focus={{ boxShadow: "none" }}
         onClick={() => handleOnClck(value)}
-        bgColor={"white"}
+        bgColor={isSelected ? "yellow.200" : "white"}
         animation={isOpen ? animation2 : animation1}
         style={{ backfaceVisibility: "hidden" }}
         top={{ base: "-6rem", md: "-10rem" }}
         opacity={isOpen ? 1 : 0}
       >
-        <Text key={`card_${index}`} textAlign={"center"} whiteSpace={"pre"}>
+        <Text textAlign={"center"} whiteSpace={"pre"}>
           {value}
         </Text>
       </Box>
