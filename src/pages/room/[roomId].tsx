@@ -182,10 +182,16 @@ const Room = () => {
             <Box display={isOpen ? "block" : "none"}>
               Avarage{" "}
               {(roomInfo?.member
-                .filter((v) => v.vote == "1/2" || Number(v.vote) || !v.vote)
-                .map((v) => (v.vote === "1/2" ? 0.5 : Number(v.vote) || 0))
-                .reduce((prev, cur) => prev + cur) || 0) /
-                (roomInfo?.member.length || 1)}
+                .map((v) => {
+                  if (v.vote === "1/2") return 0.5;
+                  if (v.vote === "?") return 0;
+                  if (Number(v.vote)) return Number(v.vote);
+                  return 0;
+                })
+                .reduce((prev, cur) => prev + cur || 0, 0) || 0) /
+                (roomInfo?.member.filter(
+                  (v) => v.vote != null && v.vote !== "?" && v.vote !== "0"
+                ).length || 1)}
             </Box>
           </VStack>
         </Box>
