@@ -23,13 +23,19 @@ export default function Home() {
     }
     setRoomId(event.currentTarget.value);
   };
-  const handleSumbit = (
+  const handleSumbit = async (
     event: React.FormEvent<HTMLButtonElement | HTMLDivElement>,
     type: "create" | "join"
   ) => {
     event.preventDefault();
     if (type === "create") {
-      router.push(`/room/${nanoid(5)}`);
+      const roomId = nanoid(5);
+      await fetch(`/api/create/room`, {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ roomId }),
+      });
+      return router.push(`/room/${roomId}`);
     } else {
       console.log(event);
       if (roomId.length === 0) {
@@ -68,7 +74,6 @@ export default function Home() {
               isClickable={true}
               isOpen={isOpen}
               isSelected={false}
-              index={""}
               handleCardClick={() => {}}
               value={"GROW\nYOUR\nTEAM."}
             />

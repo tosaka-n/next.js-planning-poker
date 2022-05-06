@@ -23,15 +23,29 @@ export type RoomDetails = {
 };
 app.prepare().then(async () => {
   const expressApp: Express = express();
+  expressApp.use(express.json());
+  expressApp.use(express.urlencoded({ extended: true }));
   const server: Server = createServer(expressApp);
   const io: socketioServer = new socketioServer();
   const roomDetails: { [roomId: string]: RoomDetails } = {};
+  const rooms: string[] = [];
   io.attach(server);
 
   expressApp.get("/socket", async (_: Request, res: Response) => {
     res.send("hello world");
   });
-
+  expressApp.get("/api/rooms", async (_: Request, res: Response) => {
+    res.json(rooms);
+  });
+  expressApp.post("/api/create/room", async (req: Request, res: Response) => {
+    if (!req.body.roomId || req.body.roomId === '') {
+      throw {
+        status: 400
+      }
+    }
+    rooms.push(req.body.roomId);
+    return res.json(rooms);
+  });
   io.on("connection", (socket: Socket) => {
     socket.timeout(1000);
     socket.on("disconnect", (data) => {
@@ -86,7 +100,6 @@ app.prepare().then(async () => {
           join: new Date(),
         });
       }
-      console.log(roomDetails[roomId].roomInfo.member);
       if (roomDetails[roomId]) {
         io.emit("roomInfo", roomDetails[roomId]);
       }
@@ -116,11 +129,13 @@ app.prepare().then(async () => {
       }
       socket.to(data.roomId).emit("roomInfo", roomDetails[data.roomId]);
     });
-    socket.on("open", ({roomId}) => {
+    socket.on("open", ({ roomId }) => {
       socket.to(roomId).emit("open");
     });
-    socket.on("reset", ({roomId}) => {
-      roomDetails[roomId].roomInfo.member = roomDetails[roomId].roomInfo.member.map(member => ({...member, vote: null}))
+    socket.on("reset", ({ roomId }) => {
+      roomDetails[roomId].roomInfo.member = roomDetails[
+        roomId
+      ].roomInfo.member.map((member) => ({ ...member, vote: null }));
       socket.to(roomId).emit("roomInfo", roomDetails[roomId]);
       socket.to(roomId).emit("reset");
     });

@@ -34,6 +34,12 @@ const Room = () => {
     if (!roomId) {
       return;
     }
+    (async () => {
+      const rooms = await (await fetch("/api/rooms")).json();
+      if (!rooms.includes(roomId)) {
+        router.push("/");
+      }
+    })();
     socket.on("connect", () => {
       console.log("join");
       socket.emit("join", { roomId });
@@ -85,28 +91,13 @@ const Room = () => {
     <Layout>
       {connected ? (
         <Box>
-          <Heading>
-            Room: {roomId} / UserId: {socket.id}
-          </Heading>
-          <Button
-            isDisabled={
-              isOpen ||
-              (!isOpen &&
-                !roomInfo?.member.every((member) => member.vote != null))
-            }
-            onClick={() => handleOpen()}
-          >
-            Open Vote
-          </Button>
-          <Button isDisabled={!isOpen} onClick={() => handleReset()}>
-            Reset Vote
-          </Button>
+          <Heading>Room: {roomId}</Heading>
           <Flex
             justifyItems={"center"}
             border={"3px solid"}
             borderColor={"black"}
             bgColor={"whatsapp.200"}
-            w={{base: 'fit-content', sm: "100vw"}}
+            w={{ base: "fit-content", sm: "100vw" }}
             mx={"auto"}
           >
             <HStack
@@ -117,7 +108,7 @@ const Room = () => {
               {["0", "1/2", "1", "3", "5", "8", "13", "20", "?"].map(
                 (value, index) => (
                   <Card
-                    index={`card_${index}`}
+                    key={`card_${index}`}
                     value={value}
                     isClickable={!isOpen}
                     isSelected={vote === value}
@@ -135,11 +126,15 @@ const Room = () => {
               {[
                 ["0", "1/2", "1", "3"],
                 ["5", "8", "13", "20", "?"],
-              ].map((arr) => (
-                <HStack mx={"auto"} spacing={{ base: "1rem", md: "2rem" }}>
+              ].map((arr, idx) => (
+                <HStack
+                  key={`key_${idx}`}
+                  mx={"auto"}
+                  spacing={{ base: "1rem", md: "2rem" }}
+                >
                   {arr.map((value, index) => (
                     <Card
-                      index={`card_${index}`}
+                      key={`card_${idx}_${index}`}
                       value={value}
                       isClickable={!isOpen}
                       isSelected={vote === value}
@@ -150,26 +145,48 @@ const Room = () => {
               ))}
             </Stack>
           </Flex>
+          <HStack mt={"1rem"} justifyContent={"center"}>
+            <Button
+              isDisabled={
+                isOpen ||
+                (!isOpen &&
+                  !roomInfo?.member.every((member) => member.vote != null))
+              }
+              onClick={() => handleOpen()}
+            >
+              Open Vote
+            </Button>
+            <Button isDisabled={!isOpen} onClick={() => handleReset()}>
+              Reset Vote
+            </Button>
+          </HStack>
           <VStack justifyItems={"center"}>
+            <HStack
+              spacing={"2rem"}
+              m={"auto"}
+              mt={{ base: "1rem", md: "2rem" }}
+            >
+              {roomInfo?.member
+                .sort((a, b) => (Number(a?.vote) || 1) - Number(b?.vote) || 1)
+                .map((member, index) => (
+                  <FlipCard
+                    key={`result_${index}`}
+                    value={member.vote}
+                    isClickable={false}
+                    isSelected={vote === member.vote}
+                    isOpen={isOpen}
+                    handleCardClick={() => {}}
+                  />
+                ))}
+            </HStack>
             <Box display={isOpen ? "block" : "none"}>
               Avarage{" "}
               {(roomInfo?.member
+                .filter((v) => v.vote == "1/2" || Number(v.vote) || !v.vote)
                 .map((v) => (v.vote === "1/2" ? 0.5 : Number(v.vote) || 0))
-                .reduce((prev, cur) => prev + cur) || 1) /
+                .reduce((prev, cur) => prev + cur) || 0) /
                 (roomInfo?.member.length || 1)}
             </Box>
-            <HStack spacing={"2rem"} m={"auto"} mt={{base: "1rem", md: "2rem"}}>
-              {roomInfo?.member.map((member, index) => (
-                <FlipCard
-                  index={`result_${index}`}
-                  value={member.vote}
-                  isClickable={false}
-                  isSelected={member.vote !== null}
-                  isOpen={isOpen}
-                  handleCardClick={() => {}}
-                />
-              ))}
-            </HStack>
           </VStack>
         </Box>
       ) : (
