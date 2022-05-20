@@ -43,6 +43,15 @@ const Room = () => {
     socket.on("connect", () => {
       console.log("join");
       socket.emit("join", { roomId });
+      if (vote !== null) {
+        socket.emit("vote", { roomId, vote });
+      }
+    });
+    socket.on("reconnect", () => {
+      console.log("reconnect");
+      if (vote !== null) {
+        socket.emit("vote", { roomId, vote });
+      }
     });
     socket.on("roomInfo", (data: RoomDetails) => {
       console.log("Recieve: roomInfo");
