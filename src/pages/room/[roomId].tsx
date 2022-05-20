@@ -105,7 +105,7 @@ const Room = () => {
               mx={"auto"}
               display={{ base: "none", lg: "flex" }}
             >
-              {["0", "1/2", "1", "3", "5", "8", "13", "20", "?"].map(
+              {["0", "1/2", "1", "2", "3", "5", "8", "13", "20", "?"].map(
                 (value, index) => (
                   <Card
                     key={`card_${index}`}
